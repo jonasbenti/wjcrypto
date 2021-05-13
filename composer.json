@@ -1,0 +1,20 @@
+{
+    "name": "trilha/webjump",
+    "description": "WJCrypto",
+    "authors": [
+        {
+            "name": "Jonas Gomes",
+            "email": "jonas.benti@webjump.com.br"
+        }
+    ],
+    "require": {
+        "pecee/simple-router": "^4.3",
+        "monolog/monolog": "^2.2",
+        "php-di/php-di": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "App/"
+        }
+    }
+}
