@@ -51,6 +51,25 @@ class ContasModel
         }
     }
 
+    public function validaConta($numero_conta, $senha)
+    {
+        try {
+            Transaction::open($this->database);
+            $result= ContasResourceModel::findByContaSenha($numero_conta, $senha);
+            Transaction::close();
+
+            // $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $result]);
+            // $log->createLog();     
+
+            return $result;
+        } catch (Exception $e) {
+        Transaction::rollback();
+        $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => '']);
+        $log->createLog();
+        echo $e->getMessage();
+        }
+    }
+
     public function delete($id)
     {
         try {

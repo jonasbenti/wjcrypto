@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Extrato de Transações</title>
+    <!--<link href="css/list.css" rel="stylesheet" type="text/css" media="screen"/>-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body class="panel panel-default" style="text-align:center">
+    <div id="appTable" class="table-responsive" height="100%" width="100%">
+    <H1>Extrato de Transações</H1>
+    <button onclick="window.location='/transacao_new'" class="btn btn-success">
+        Nova Transação
+   </button>
+   <button onclick="window.location='/'" class="btn btn-danger">
+        Voltar a tela inicial
+    </button>
+<table class="table table-striped">
+<thead class="thead-dark">
+    <tr>
+        <td><b>Nº</b></td>
+        <td><b>Tipo Transacao</b></td>
+        <td><b>Conta Transferência</b></td>
+        <td><b>Operação</b></td>
+        <td><b>Valor</b></td>
+        <td><b>Data</b></td>
+    </tr>
+</thead>
+<tbody class="Table table-striped table-bordered table-hover">
+    {items}
+</tbody>
+    
+</table>
+
+
+</div>
+
+</body>
+</html>

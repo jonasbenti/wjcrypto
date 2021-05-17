@@ -10,9 +10,24 @@ class ContasResourceModel
 {
     public static function find($id)
     {
-        if ($conn = Transaction::get()) {            
-            $result = $conn->prepare("select * from contas WHERE id= :id");
+        if ($conn = Transaction::get()) {    
+            $sql = "select * from contas WHERE id= :id";        
+            $result = $conn->prepare($sql);
             $result->execute([':id' => $id]);
+            $contas = $result->fetch(PDO::FETCH_ASSOC);
+            
+            return $contas;
+        } else {
+            throw new Exception('Não há transação ativa!!'.__FUNCTION__);
+        }
+    }
+
+    public static function findByContaSenha($numero_conta, $senha)
+    {
+        if ($conn = Transaction::get()) { 
+            $sql = "select * from contas WHERE numero_conta = :numero_conta and senha = :senha";            
+            $result = $conn->prepare($sql);
+            $result->execute([':numero_conta' => $numero_conta, ':senha' => $senha]);
             $contas = $result->fetch(PDO::FETCH_ASSOC);
             
             return $contas;

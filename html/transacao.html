@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Operações WJCrypto</title>
+    <!--<link href="css/form.css" rel="stylesheet" type="text/css" media="screen"/>-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://igorescobar.github.io/jQuery-Mask-Plugin/js/jquery.mask.min.js"></script>  
+</head>
+<body>
+    
+<div class="container">
+        <h3>Transação</h3>
+        <!-- <form enctype="multipart/form-data"  method="post" href="/"> -->
+    <!-- <form id="formTransacao" method="post"> -->
+        <input type="hidden" id="contas_id" value="1">
+    
+        <div class="form-check-inline">
+            <label class="form-check-label"> <p>Tipo de Transação: </p> 
+                <input type="radio" class="form-check-input" name="tipo_transacao_id" value="1" onchange="exibir_ocultar(this)" required>Depósito
+                <input type="radio" class="form-check-input" name="tipo_transacao_id" value="2" onchange="exibir_ocultar(this)">Saque
+                <input type="radio" class="form-check-input" name="tipo_transacao_id" value="3" onchange="exibir_ocultar(this)">Transferência
+            </label>
+            <br>
+        </div> 
+        <div id="conta_transferencia_id_div" class="form-group" placeholder="000000" style="display:none">
+            <label for="cep">Conta destino:</label>
+            <input id="conta_transferencia_id" name="conta_transferencia_id" class="cep form-control" type="text" style="width: 30%"/>
+        </div>
+
+        <div id="valor_div" class="form-group" style="display:none">
+            <label for="dinheiro">Valor:</label>
+            <input id="valor" name="valor" class="dinheiro form-control" type="text" style="width: 30%" required/>
+        </div>      
+        <br>
+        <a href="/"><button type="button" class="btn btn-danger" id="btnBack">Voltar</button></a>
+        <button onclick="enviarDados()" class="btn btn-success" id="btnSubmit">Realizar Transacão</button>
+    
+        <!-- <button class="transacao">Realizar Transacão</button>
+        <a href="/transacao" > Lista de Transações </a> -->
+    <!-- </form>   -->
+    <!-- </form> -->
+    
+</div>
+<script>
+    var el_contas_id = document.getElementById("contas_id");
+    var el_conta_transferencia_id = document.getElementById("conta_transferencia_id");
+    var el_valor = document.getElementById("valor");
+
+    function enviarDados() {
+        contas_id = el_contas_id.value;
+        conta_transferencia_id = el_conta_transferencia_id.value;
+        tipo_transacao_id = document.querySelector("input[name=tipo_transacao_id]:checked").value;
+        valor = el_valor.value;   
+        credito_debito = tipo_transacao_id == 1 ? 'C' : 'D';
+
+        //colunas a ajustar
+        valor = valor.replace(".", "").replace(",",".");
+        conta_transferencia_id = tipo_transacao_id == 3 ? conta_transferencia_id : 0;
+
+
+        body = {
+            contas_id: contas_id,
+            conta_transferencia_id: conta_transferencia_id,
+            tipo_transacao_id: tipo_transacao_id,
+            valor: valor,
+            credito_debito: credito_debito
+        };
+        //JSON.stringify(body);
+        console.log(body);
+
+        jQuery.ajax(
+            {
+                url: '/transacao/create',
+                type: 'POST',
+                data: body
+            }
+        ).done(
+            function (xhr) {
+                console.log(xhr);
+            }
+        )
+            
+
+
+
+        // console.log("conta: "+contas_id+", transf.: "+conta_transferencia_id+
+        // ", valor: "+valor+", tipo: "+tipo_transacao_id+", CD: "+credito_debito );
+        //JSON.stringify(el_tipo_transacao_id);
+        //console.log(tipo_transacao_id);
+    }
+
+    
+    // var titulo = $("#txtTitle").val();
+    // var descricao = $("#txtDescription").val();
+    // var videoid = $("#txtVideoid").val();
+    // $(document).on('click', '.transacao', function () {
+    //     $.ajax({
+    //         url: "/transacao/create",
+    //         type: 'POST',
+    //         showLoader: true,
+    //         data: {
+    //         'amount': $('input[name="amount"]')[0].value
+    //         }
+    //     });
+    // });
+    // $("#formTransacao").submit(function(e){
+    //     console.log(id);
+    //     return;
+    // // sendForm();
+    // // e.preventDefault();
+    // });
+
+
+    // function sendForm(){
+    // var obj = {
+    //     id : $("#txtId").val(),
+    //     titulo : $("#txtTitle").val(),
+    //     descricao : $("#txtDescription").val(),
+    //     videoid : $("#txtVideoid").val()
+    // };
+
+//   var result = validate(obj);
+//   $("#dvAlert").text(result);
+
+//   if(result != ""){
+//     return;
+//   }
+
+//   if(obj.id == 0){
+//     create(obj);
+//   }else{
+//     update(obj);
+//   }
+// }
+
+
+
+
+    $('.dinheiro').mask('#.##0,00', {reverse: true});
+    $('.cep').mask('000000');
+    function exibir_ocultar(val) {
+    if(val.value != '3') {
+        
+        document.getElementById('conta_transferencia_id_div').style.display = 'none';
+        document.getElementById('valor_div').style.display = 'block';
+        document.getElementById('conta_transferencia_id').required = false;
+    } else {
+        document.getElementById('conta_transferencia_id_div').style.display = 'block';
+        document.getElementById('valor_div').style.display = 'block';
+        document.getElementById('conta_transferencia_id').required = true;
+    }
+    };
+</script>
+   
+  
+    
+</body>
+</html>
