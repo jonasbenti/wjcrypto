@@ -8,12 +8,12 @@ use App\Core\Transaction;
 
 class ContasResourceModel
 {
-    public static function find($id)
+    public static function find($numero_conta)
     {
         if ($conn = Transaction::get()) {    
-            $sql = "select * from contas WHERE id= :id";        
+            $sql = "select * from contas WHERE numero_conta = :numero_conta";        
             $result = $conn->prepare($sql);
-            $result->execute([':id' => $id]);
+            $result->execute([':numero_conta' => $numero_conta]);
             $contas = $result->fetch(PDO::FETCH_ASSOC);
             
             return $contas;
@@ -66,12 +66,12 @@ class ContasResourceModel
         }
     }
 
-    public static function delete($id)
+    public static function delete($numero_conta)
     {
         if ($conn = Transaction::get()) {
-            $sql = "DELETE from contas WHERE id= :id";
+            $sql = "DELETE from contas WHERE numero_conta= :numero_conta";
             $result = $conn->prepare($sql);
-            $result->execute([':id' => $id]);
+            $result->execute([':numero_conta' => $numero_conta]);
 
             return $result;
         } else {

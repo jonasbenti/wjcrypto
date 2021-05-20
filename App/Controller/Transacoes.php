@@ -67,13 +67,12 @@ class Transacoes implements ControllerInterface
     {
         try {
             $list = $this->transacoes->load();
-        } catch (Exception $e) {
-           // $this->logger->log('Transfer Error: ', $_POST);
+        } catch (Exception $e) {           
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
         }
-        //$this->logger->log('Transfer Success: ', $_POST);
+        
         $this->helper->response()->json([
             "message" => "Lista carregada",
             "res" => $list
@@ -88,12 +87,12 @@ class Transacoes implements ControllerInterface
         try {
             $list = $this->transacoes->edit($id);
         } catch (Exception $e) {
-           // $this->logger->log('Transfer Error: ', $_POST);
+           
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
         }
-        //$this->logger->log('Transfer Success: ', $_POST);
+        
         $this->helper->response()->json([
             "message" => "Registro carregado com sucesso!",
             "res" => $list
@@ -115,7 +114,7 @@ class Transacoes implements ControllerInterface
             $log->createLog();
             
         } catch (Exception $e) {
-           // $this->logger->log('Transfer Error: ', $_POST);
+           
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
@@ -129,12 +128,12 @@ class Transacoes implements ControllerInterface
         try {
             $list = $this->transacoes->delete($id);
         } catch (Exception $e) {
-           // $this->logger->log('Transfer Error: ', $_POST);
+           
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
         }
-        //$this->logger->log('Transfer Success: ', $_POST);
+        
         $this->helper->response()->json([
             "message" => "Deletado Success $id",
             "res" => $list

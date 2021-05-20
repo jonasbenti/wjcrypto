@@ -4,25 +4,47 @@ namespace App\Controller;
 
 use Exception;
 use App\Helper\Helper;
-use App\Model\TipoTransacaoModel;
+use App\Model\ContasModel;
 use App\Api\Controller\ControllerInterface;
 
-class TipoTransacao implements ControllerInterface
+class Contas implements ControllerInterface
 {
     /** @var Helper $helper */
     private $helper;
-    private $tipo_transacao;
+    private $contas;
 
     public function __construct(Helper $helper)
     {
         $this->helper = $helper;
-        $this->tipo_transacao = new TipoTransacaoModel();
+        $this->contas = new ContasModel();
     }
 
     public function execute (?array $params = null): void
     {
+        echo "";
+        // try {
+        //     $list = $this->contas->load();
+        // } catch (Exception $e) {
+           
+        //     $this->helper->response()->json([
+        //         "message" => $e->getMessage()
+        //     ]);
+        // }
+        
+        // $this->helper->response()->json([
+        //     "message" => "Transfer Success",
+        //     "res" => $list
+        // ]);
+
+        //$this->helper->redirect('/html/index.html');
+        // $this->helper->redirect('https://www.google.com');
+    }
+
+    public function getById (string $numero_conta): void
+    {
+
         try {
-            $list = $this->tipo_transacao->load();
+            $list = $this->contas->edit($numero_conta);
         } catch (Exception $e) {
            
             $this->helper->response()->json([
@@ -31,7 +53,7 @@ class TipoTransacao implements ControllerInterface
         }
         
         $this->helper->response()->json([
-            "message" => "Transfer Success",
+            "message" => "Conta listada",
             "res" => $list
         ]);
 
@@ -39,10 +61,10 @@ class TipoTransacao implements ControllerInterface
         // $this->helper->redirect('https://www.google.com');
     }
 
-    public function getById (int $id): void
+    public function getTransacoesByConta (string $numero_conta): void
     {
         try {
-            $list = $this->tipo_transacao->edit($id);
+            $list = $this->contas->getTransacoesByConta($numero_conta);
         } catch (Exception $e) {
            
             $this->helper->response()->json([
@@ -51,20 +73,19 @@ class TipoTransacao implements ControllerInterface
         }
         
         $this->helper->response()->json([
-            "message" => "Item listado",
+            "message" => "Transações listadas com sucesso!",
             "res" => $list
         ]);
 
         //$this->helper->redirect('/html/index.html');
         // $this->helper->redirect('https://www.google.com');
     }
-
+   
     public function save (): void
     {
         try {
-            $list = $this->tipo_transacao->save($_POST);
-        } catch (Exception $e) {
-           
+            $list = $this->contas->save($_POST);
+        } catch (Exception $e) {           
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
@@ -79,20 +100,19 @@ class TipoTransacao implements ControllerInterface
         // $this->helper->redirect('https://www.google.com');
     }
 
-    public function delete (int $id): void
+    public function getSaldoConta (string $numero_conta): void
     {
         try {
-            $list = $this->tipo_transacao->delete($id);
-        } catch (Exception $e) {
-           
+            $saldo = $this->contas->getSaldoByConta($numero_conta);
+        } catch (Exception $e) {           
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
         }
         
         $this->helper->response()->json([
-            "message" => "Deletado com successo! ID: $id",
-            "res" => $list
+            "message" => "Consulta de saldo efetuada com successo!",
+            "res" => $saldo
         ]);
 
         //$this->helper->redirect('/html/index.html');

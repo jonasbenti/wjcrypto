@@ -32,11 +32,11 @@ class ContasModel
         }
     }
 
-    public function edit($id)
+    public function edit($numero_conta)
     {
         try {
             Transaction::open($this->database);
-            $result= ContasResourceModel::find($id);
+            $result= ContasResourceModel::find($numero_conta);
             Transaction::close();
 
             $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $result]);
@@ -45,7 +45,7 @@ class ContasModel
             return $result;
         } catch (Exception $e) {
         Transaction::rollback();
-        $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $id]);
+        $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
         $log->createLog();
         echo $e->getMessage();
         }
@@ -70,11 +70,54 @@ class ContasModel
         }
     }
 
-    public function delete($id)
+    public function getSaldoByConta($numero_conta)
+    {
+        try 
+        {
+            Transaction::open($this->database);
+            $dados_conta = ContasResourceModel::find($numero_conta);
+            $transacoes_conta = ContasResourceModel::findTransacoesByConta($dados_conta['id']);
+            Transaction::close();
+
+            $saldo = ContasResourceModel::getSaldo($transacoes_conta);
+
+            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $transacoes_conta]);
+            $log->createLog();
+            
+            return $saldo;
+        } catch (Exception $e) {
+            Transaction::rollback();
+            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
+            $log->createLog();
+            echo $e->getMessage();
+        }
+    }
+
+    public function getTransacoesByConta($numero_conta)
+    {
+        try {
+            Transaction::open($this->database);
+            $dados_conta = ContasResourceModel::find($numero_conta);
+            $transacoes_conta = ContasResourceModel::findTransacoesByConta($dados_conta['id']);
+            Transaction::close();
+
+            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $transacoes_conta]);
+            $log->createLog();
+            
+            return $transacoes_conta;
+        } catch (Exception $e) {
+            Transaction::rollback();
+            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
+            $log->createLog();
+            echo $e->getMessage();
+        }
+    }
+
+    public function delete($numero_conta)
     {
         try {
             Transaction::open($this->database);   
-            $result = ContasResourceModel::delete($id);    
+            $result = ContasResourceModel::delete($numero_conta);    
             Transaction::close();
 
             $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $result]);
@@ -83,7 +126,7 @@ class ContasModel
             return $result;
         } catch (Exception $e) {
             Transaction::rollback();
-            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $id]);
+            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
             $log->createLog();
             echo $e->getMessage();
         }

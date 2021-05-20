@@ -4,7 +4,7 @@ namespace App\Model;
 
 use Exception;
 
-class CryptModel
+class UtilModel
 {
     public static function encrypt(array $array_crypt)
     {        
@@ -35,4 +35,23 @@ class CryptModel
             throw new Exception('Lista de dados vazia!'.__FUNCTION__);
         }
     } 
+
+    public static function authToken ()
+    {
+        $header = apache_request_headers();
+        $header['Authorization'];
+        $auth1 = explode(' ',$header['Authorization']);
+         
+        //  die;
+        //  var_dump($_POST);
+        $auth_decrypt = base64_decode($auth1[1]);
+        $auth1 = explode(':',$auth_decrypt);
+
+        // var_dump($auth1);
+        // die;
+        $numero_conta = $auth1[0];
+        $senha = $auth1[1];
+
+        return ['numero_conta' => $numero_conta, 'senha' => $senha];
+    }
 }
