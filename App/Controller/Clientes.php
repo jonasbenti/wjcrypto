@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Exception;
 use App\Helper\Helper;
+use App\Model\LoggerModel;
 use App\Model\ClientesModel;
 use App\Api\Controller\ControllerInterface;
 
@@ -27,41 +28,37 @@ class Clientes implements ControllerInterface
     public function getById (int $id): void
     {
         try {
-            $list = $this->clientes->edit($id);
+            $result = $this->clientes->edit($id);
+            $log = new LoggerModel('warning', __FUNCTION__." - Cliente ",['msg' => $result, 'data' => $id]);
+            $log->createLog();
+            $this->helper->response()->json([
+                "message" => $result
+            ]);      
         } catch (Exception $e) {
-           
+            $log = new LoggerModel('error', __FUNCTION__." - Cliente ",['msg' => $e->getMessage(), 'data' => $id]);
+            $log->createLog();
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
         }
-        
-        $this->helper->response()->json([
-            "message" => "Cliente listado",
-            "res" => $list
-        ]);
-
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
     }
 
     public function save (): void
     {
         try {
-            $list = $this->clientes->save($_POST);
+            $result = $this->clientes->save($_POST);
+            $log = new LoggerModel('warning', __FUNCTION__." - Cliente ",['msg' => $result, 'data' => $_POST]);
+            $log->createLog();
+            $this->helper->response()->json([
+                "message" => $result
+            ]);      
         } catch (Exception $e) {
-           
+            $log = new LoggerModel('error', __FUNCTION__." - Cliente ",['msg' => $e->getMessage(), 'data' => $_POST]);
+            $log->createLog();
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
         }
-        
-        $this->helper->response()->json([
-            "message" => "Salvo com successo!",
-            "res" => $list
-        ]);
-
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
     }
 
 }

@@ -13,134 +13,110 @@ class Transacoes implements ControllerInterface
     /** @var Helper $helper */
     private $helper;
     private $transacoes;
-    // private $html;
+    private $numero_conta;
 
     public function __construct(Helper $helper)
     {
         $this->helper = $helper;
         $this->transacoes = new TransacoesModel();
-        // $this->html = file_get_contents('html/list_transacoes.html');
+        $this->numero_conta = isset($_SESSION['numero_conta']) ? $_SESSION['numero_conta'] : "API";
     }
 
     public function execute (?array $params = null): void
     {
-        $html = file_get_contents('html/transacao.html');        
+        $html = file_get_contents('html/form_transacao.html');  
+        $html = str_replace('{token}', $_SESSION['auth'], $html);      
+        $html = str_replace('{numero_conta}', $_SESSION['numero_conta'], $html);  
+        $html = str_replace('{contas_id}', $_SESSION['contas_id'], $html);  
+            
         echo $html;
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
     }
 
-    public function extract (?array $params = null): void
+    public function extract (string $numero_conta): void
     {
         $items = '';
         $html = file_get_contents('html/list_transacoes.html');  
 
-        $url = "http://trilha2.webjump.com.br/transacao/";
-        // $get = file_get_contents($url);
-        // $result = json_decode($get, true);
-        // var_dump($result['res']);
-        //url = "https://www.canalti.com.br/api/pokemons.json"; 
+        $auth_basic = $_SESSION['auth'];
+        $url = "http://trilha1.webjump.com.br/contas_transacoes/".$numero_conta;
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Basic $auth_basic"));
         $transacoes = json_decode(curl_exec($ch), true);
         
-        foreach($transacoes['res'] as $transacao){
+        foreach($transacoes['message'] as $transacao){
             $item = file_get_contents('html/item_transacoes.html');
-            foreach($transacao as $index => $value){
-                if($index != 'updated_at') {              
-                $item = str_replace('{'.$index.'}', $value, $item);
-                }            
-            }
+            extract($transacao);
+            $valor =  str_replace('.', ',', $valor);
+            $credito_debito = ($credito_debito == 'C') ? 'Crédito' : 'Débito' ;
+            $item = str_replace('{numero_transacao}', $numero_transacao, $item);
+            $item = str_replace('{tipo_transacao}', $tipo_transacao, $item);
+            $item = str_replace('{conta_transferencia_id}', $conta_transferencia_id, $item);
+            $item = str_replace('{credito_debito}', $credito_debito, $item);
+            $item = str_replace('{valor}', $valor, $item);
+            $item = str_replace('{created_at}', $created_at, $item);
+
             $items .= $item;
         }
+        $html = str_replace('{numero_conta}', $numero_conta, $html);
         $html = str_replace('{items}', $items, $html);
-        //var_dump($result);
-        //die;
+        $log = new LoggerModel('warning', __FUNCTION__." - Conta ".$numero_conta,['msg' => 'Acesso Lista de Transações', 'data' => $transacoes]);
+        $log->createLog();
         echo $html;
-
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
     }
 
     public function list (?array $params = null): void
     {
         try {
-            $list = $this->transacoes->load();
-        } catch (Exception $e) {           
+            $result = $this->transacoes->load();
+            $log = new LoggerModel('warning', __FUNCTION__." - Conta ".$this->numero_conta ,['msg' => $result, 'data' => '']);
+            $log->createLog();
+            $this->helper->response()->json([
+                "message" => $result
+            ]);      
+        } catch (Exception $e) {
+            $log = new LoggerModel('error', __FUNCTION__." - Conta ".$this->numero_conta ,['msg' => $e->getMessage(), 'data' => '']);
+            $log->createLog();
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
-        }
-        
-        $this->helper->response()->json([
-            "message" => "Lista carregada",
-            "res" => $list
-        ]);
-
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
+        }      
     }
 
     public function getById (int $id): void
     {
         try {
-            $list = $this->transacoes->edit($id);
+            $result = $this->transacoes->edit($id);
+            $log = new LoggerModel('warning', __FUNCTION__." - Conta ".$this->numero_conta ,['msg' => $result, 'data' => $id]);
+            $log->createLog();
+            $this->helper->response()->json([
+                "message" => $result
+            ]);      
         } catch (Exception $e) {
-           
+            $log = new LoggerModel('error', __FUNCTION__." - Conta ".$this->numero_conta ,['msg' => $e->getMessage(), 'data' => $id]);
+            $log->createLog();
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
-        }
-        
-        $this->helper->response()->json([
-            "message" => "Registro carregado com sucesso!",
-            "res" => $list
-        ]);
-
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
+        }      
     }
 
     public function createTransacao (): void
     {
         try {
             $result = $this->transacoes->createTransacao($_POST);
-            $this->helper->response()->json([
-                "message" => "Salvo com sucesso!",
-                "res" => $result
-            ]);
-            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['msg' => $result , 'data' => $_POST]);
+            $log = new LoggerModel('warning', __FUNCTION__." - Conta ".$this->numero_conta ,['msg' => $result, 'data' => $_POST]);
             $log->createLog();
-            
+            $this->helper->response()->json([
+                "message" => $result
+            ]);          
         } catch (Exception $e) {
-           
+            $log = new LoggerModel('error', __FUNCTION__." - Conta ".$this->numero_conta ,['msg' => $e->getMessage(), 'data' => $_POST]);
+            $log->createLog();
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
-        }
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
+        } 
     }
-
-    public function delete (int $id): void
-    {
-        try {
-            $list = $this->transacoes->delete($id);
-        } catch (Exception $e) {
-           
-            $this->helper->response()->json([
-                "message" => $e->getMessage()
-            ]);
-        }
-        
-        $this->helper->response()->json([
-            "message" => "Deletado Success $id",
-            "res" => $list
-        ]);
-
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
-    }
-
 }

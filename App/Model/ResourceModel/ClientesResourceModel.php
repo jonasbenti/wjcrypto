@@ -19,15 +19,13 @@ class ClientesResourceModel
             throw new Exception('Não há transação ativa!!'.__FUNCTION__);
         }
     }
-
-    public static function delete($id)
+    public static function findByCpfCnpj($cpf_cnpj)
     {
-        if ($conn = Transaction::get()) {
-            $sql = "DELETE from clientes WHERE id= :id";
-            $result = $conn->prepare($sql);
-            $result->execute([':id' => $id]);
-
-            return $result;
+        if ($conn = Transaction::get()) {            
+            $result = $conn->prepare("select * from clientes WHERE cpf_cnpj= :cpf_cnpj order by id DESC");
+            $result->execute([':cpf_cnpj' => $cpf_cnpj]);
+            
+            return $result->fetch(PDO::FETCH_ASSOC);
         } else {
             throw new Exception('Não há transação ativa!!'.__FUNCTION__);
         }

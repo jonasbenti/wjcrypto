@@ -20,14 +20,13 @@ class EnderecosResourceModel
         }
     }
 
-    public static function delete($id)
+    public static function findByclienteByDesc($clientes_id, $descricao)
     {
-        if ($conn = Transaction::get()) {
-            $sql = "DELETE from enderecos WHERE id= :id";
-            $result = $conn->prepare($sql);
-            $result->execute([':id' => $id]);
-
-            return $result;
+        if ($conn = Transaction::get()) {            
+            $result = $conn->prepare("select * from enderecos WHERE descricao= :descricao and clientes_id = :clientes_id");
+            $result->execute([':descricao' => $descricao, ':clientes_id' => $clientes_id]);
+            
+            return $result->fetch(PDO::FETCH_ASSOC);
         } else {
             throw new Exception('Não há transação ativa!!'.__FUNCTION__);
         }

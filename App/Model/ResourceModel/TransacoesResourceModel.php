@@ -20,19 +20,6 @@ class TransacoesResourceModel
         }
     }
 
-    public static function delete($id)
-    {
-        if ($conn = Transaction::get()) {
-            $sql = "DELETE from transacoes WHERE id= :id";
-            $result = $conn->prepare($sql);
-            $result->execute([':id' => $id]);
-
-            return $result;
-        } else {
-            throw new Exception('Não há transação ativa!!'.__FUNCTION__);
-        }
-    }
-
     public static function all()
     {
         if ($conn = Transaction::get()) { 

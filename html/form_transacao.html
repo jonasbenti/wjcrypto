@@ -12,10 +12,14 @@
 <body>
     
 <div class="container">
-        <h3>Transação</h3>
+        <div class="panel panel-primary">
+            <div class="panel-heading" style="text-align:center">Transação: Conta {numero_conta}</div>
+        </div>
         <!-- <form enctype="multipart/form-data"  method="post" href="/"> -->
-    <!-- <form id="formTransacao" method="post"> -->
-        <input type="hidden" id="contas_id" value="1">
+        <!-- <form id="formTransacao" method="post"> -->
+        <input type="hidden" id="contas_id" value="{contas_id}">
+        <input type="hidden" id="token" value="{token}">
+        <input type="hidden" id="numero_conta" value="{numero_conta}">
     
         <div class="form-check-inline">
             <label class="form-check-label"> <p>Tipo de Transação: </p> 
@@ -37,17 +41,14 @@
         <br>
         <a href="/"><button type="button" class="btn btn-danger" id="btnBack">Voltar</button></a>
         <button onclick="enviarDados()" class="btn btn-success" id="btnSubmit">Realizar Transacão</button>
-    
-        <!-- <button class="transacao">Realizar Transacão</button>
-        <a href="/transacao" > Lista de Transações </a> -->
-    <!-- </form>   -->
-    <!-- </form> -->
-    
+     
 </div>
 <script>
     var el_contas_id = document.getElementById("contas_id");
     var el_conta_transferencia_id = document.getElementById("conta_transferencia_id");
     var el_valor = document.getElementById("valor");
+    var el_token = document.getElementById("token");
+    var el_numero_conta = document.getElementById("numero_conta");    
 
     function enviarDados() {
         contas_id = el_contas_id.value;
@@ -55,6 +56,8 @@
         tipo_transacao_id = document.querySelector("input[name=tipo_transacao_id]:checked").value;
         valor = el_valor.value;   
         credito_debito = tipo_transacao_id == 1 ? 'C' : 'D';
+        token = el_token.value;
+        numero_conta = el_numero_conta.value;
 
         //colunas a ajustar
         valor = valor.replace(".", "").replace(",",".");
@@ -68,94 +71,41 @@
             valor: valor,
             credito_debito: credito_debito
         };
-        //JSON.stringify(body);
-        console.log(body);
-
+        
         jQuery.ajax(
             {
                 url: '/transacao/create',
                 type: 'POST',
+                headers: {'Authorization': 'Basic '+token},
                 data: body
             }
         ).done(
             function (xhr) {
                 console.log(xhr);
+                alert(xhr.message);
+                //window.location='transacao_list/'+numero_conta;
             }
-        )
-            
-
-
-
-        // console.log("conta: "+contas_id+", transf.: "+conta_transferencia_id+
-        // ", valor: "+valor+", tipo: "+tipo_transacao_id+", CD: "+credito_debito );
-        //JSON.stringify(el_tipo_transacao_id);
-        //console.log(tipo_transacao_id);
+        ).fail(function(xhr, textStatus, obj) {
+                console.log(obj.message);
+            alert("erro ao realizar transação!"+obj.message);
+            return false;
+        })
     }
-
-    
-    // var titulo = $("#txtTitle").val();
-    // var descricao = $("#txtDescription").val();
-    // var videoid = $("#txtVideoid").val();
-    // $(document).on('click', '.transacao', function () {
-    //     $.ajax({
-    //         url: "/transacao/create",
-    //         type: 'POST',
-    //         showLoader: true,
-    //         data: {
-    //         'amount': $('input[name="amount"]')[0].value
-    //         }
-    //     });
-    // });
-    // $("#formTransacao").submit(function(e){
-    //     console.log(id);
-    //     return;
-    // // sendForm();
-    // // e.preventDefault();
-    // });
-
-
-    // function sendForm(){
-    // var obj = {
-    //     id : $("#txtId").val(),
-    //     titulo : $("#txtTitle").val(),
-    //     descricao : $("#txtDescription").val(),
-    //     videoid : $("#txtVideoid").val()
-    // };
-
-//   var result = validate(obj);
-//   $("#dvAlert").text(result);
-
-//   if(result != ""){
-//     return;
-//   }
-
-//   if(obj.id == 0){
-//     create(obj);
-//   }else{
-//     update(obj);
-//   }
-// }
-
-
-
 
     $('.dinheiro').mask('#.##0,00', {reverse: true});
     $('.cep').mask('000000');
     function exibir_ocultar(val) {
-    if(val.value != '3') {
-        
-        document.getElementById('conta_transferencia_id_div').style.display = 'none';
-        document.getElementById('valor_div').style.display = 'block';
-        document.getElementById('conta_transferencia_id').required = false;
-    } else {
-        document.getElementById('conta_transferencia_id_div').style.display = 'block';
-        document.getElementById('valor_div').style.display = 'block';
-        document.getElementById('conta_transferencia_id').required = true;
-    }
+        if(val.value != '3') {
+            
+            document.getElementById('conta_transferencia_id_div').style.display = 'none';
+            document.getElementById('valor_div').style.display = 'block';
+            document.getElementById('conta_transferencia_id').required = false;
+        } else {
+            document.getElementById('conta_transferencia_id_div').style.display = 'block';
+            document.getElementById('valor_div').style.display = 'block';
+            document.getElementById('conta_transferencia_id').required = true;
+        }
     };
 </script>
-   
-  
-    
 </body>
 </html>

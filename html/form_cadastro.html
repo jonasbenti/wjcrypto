@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">    
+    <title>WjCrypto - A moeda do Futuro</title>
+    <!--<link href="css/list.css" rel="stylesheet" type="text/css" media="screen"/>-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.validate/1.7/jquery.validate.js"></script>
+
+</head>
+    <div class="panel panel-primary">
+        <div class="panel-heading" style="text-align:center">Dados Pessoais</div>
+    </div>
+    <div class="container">
+        <label class="form-check-label"> Tipo de Cliente:
+            <input type="radio" class="form-check-input" name="tipo_cliente" value="PF" checked required>Pessoa Física
+            <input type="radio" class="form-check-input" name="tipo_cliente" value="PJ" >Pessoa Jurídica
+        </label>
+    </div> 
+    <div class="container">
+      <div class="form-group col-md-6">
+        <label for="nome_razao">Nome/Razão Social</label>
+        <input type="text" class="form-control" id="nome_razao" placeholder="Digite seu nome para pessoa física ou razão social para pessoa jurídica" required>
+      </div>
+      <div class="form-group col-md-3">
+        <label for="cpf_cnpj">CPF/CNPJ</label>
+        <input type="text" class="form-control" id="cpf_cnpj" placeholder="CPF para PF ou CNPJ para PJ" required>
+      </div>
+      <div class="form-group col-md-3">
+        <label for="rg_ie">RG/Inscrição Estadual</label>
+        <input type="text" class="form-control" id="rg_ie" placeholder="RG para PF ou razão social para PJ">
+      </div>
+    </div>
+    <div class="container">        
+        <div class="form-group col-md-3">
+            <label for="data_nascimento_fundacao">Data Nascimento/Fundação</label>
+            <input type="date" class="form-control" id="data_nascimento_fundacao">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="telefone">Telefone</label>
+            <input type="text" class="form-control" id="telefone" placeholder="Digite seu telefone com DDD" required>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading" style="text-align:center">Dados Endereço</div>
+    </div>
+    <div class="container">
+      <div class="form-group col-md-4">
+            <label for="descricao">Descrição</label>
+            <input type="text" class="form-control" id="descricao" placeholder="Exemplo: Casa, trabalho e etc..." required>
+      </div>
+      <div class="form-group col-md-2">
+        <label for="cep">CEP</label>
+        <input type="text" class="form-control" id="cep" required>
+      </div>
+      <div class="form-group col-md-1">
+        <label for="uf">UF</label>
+        <input type="text" class="form-control" id="uf" required>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="cidade">Cidade</label>
+        <input type="text" class="form-control" id="cidade" required>
+      </div>      
+    </div>
+    <div class="container">
+        <div class="form-group col-md-8">
+          <label for="logradouro">Logradouro</label>
+          <input type="text" class="form-control" id="logradouro" required>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="numero">Número</label>
+          <input type="text" class="form-control" id="numero">
+        </div>
+    </div>
+    <div class="container">
+        <div class="form-group col-md-4">
+          <label for="complemento">Complemento</label>
+          <input type="text" class="form-control" id="complemento">
+        </div> 
+        <div class="form-group col-md-4">
+            <label for="referencia">Referência</label>
+            <input type="text" class="form-control" id="referencia">
+          </div>        
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading" style="text-align:center">Dados Conta</div>
+    </div>
+
+    <div class="container">
+      <div class="form-group col-md-6">
+        <label for="senha">Senha</label>
+        <input type="password" class="form-control" id="senha">
+      </div>      
+    </div>
+    <div class="form-group col-md-12" style="text-align:center">
+        <!-- <input type="submit" class="btn btn-success" value="Cadastrar"> -->
+        <button onclick="enviarDados()" class="btn btn-primary" id="btnSubmit">Cadastrar conta</button>
+    </div>  
+<!-- </form> -->
+    <script type="text/javascript">
+    //dados pessoais
+    var el_nome_razao = document.getElementById("nome_razao");
+    var el_cpf_cnpj = document.getElementById("cpf_cnpj");
+    var el_rg_ie = document.getElementById("rg_ie");
+    var el_data_nascimento_fundacao = document.getElementById("data_nascimento_fundacao");
+    var el_telefone = document.getElementById("telefone");
+    //dados endereço
+    var el_descricao = document.getElementById("descricao");
+    var el_cep = document.getElementById("cep");
+    var el_uf = document.getElementById("uf");
+    var el_cidade = document.getElementById("cidade");
+    var el_logradouro = document.getElementById("logradouro");
+    var el_numero = document.getElementById("numero");
+    var el_complemento = document.getElementById("complemento");
+    var el_referencia = document.getElementById("referencia");
+    //Dados da conta
+    var el_senha = document.getElementById("senha");
+        
+    
+    function enviarDados() {
+        //dados pessoais
+        tipo_cliente = document.querySelector("input[name=tipo_cliente]:checked").value;
+        nome_razao = el_nome_razao.value;
+        cpf_cnpj = el_cpf_cnpj.value;        
+        rg_ie = el_rg_ie.value;   
+        data_nascimento_fundacao = el_data_nascimento_fundacao.value;   
+        telefone = el_telefone.value;   
+        //dados endereço
+        descricao = el_descricao.value;
+        cep = el_cep.value;        
+        uf = el_uf.value;   
+        cidade = el_cidade.value;   
+        logradouro = el_logradouro.value;
+        numero = el_numero.value;
+        complemento = el_complemento.value;
+        referencia = el_referencia.value;
+        //dados da conta
+        senha = el_senha.value;
+
+        if(senha == "") {
+          alert('senha não preenchida');
+          return false;
+        }
+        if(tipo_cliente == null) {
+          alert('tipo cliente não preenchido');
+          return false;
+        }        
+
+        body = {
+            cli_tipo_cliente: tipo_cliente,
+            cli_nome_razao: nome_razao,
+            cli_cpf_cnpj: cpf_cnpj,
+            cli_rg_ie: rg_ie,
+            cli_data_nascimento_fundacao: data_nascimento_fundacao,
+            cli_telefone: telefone,
+            end_descricao: descricao,
+            end_cep: cep,
+            end_uf: uf,
+            end_cidade: cidade,
+            end_logradouro: logradouro,
+            end_numero: numero,
+            end_complemento: complemento,
+            end_referencia: referencia,
+            con_senha: senha
+        };
+        jQuery.ajax(
+            {
+                url: '/contas_cliente/create',
+                type: 'POST',
+                data: body
+            }
+        ).done(
+            function (xhr, textStatus, obj) {
+                alert(xhr.message+". Na tela de login entre com a senha cadastrada e o numero da conta.");
+                //window.location='login/';
+            }
+        ).fail(function(xhr, textStatus, obj) {
+          alert("erro ao realizar transação!"+obj.message);
+            return false;
+        })
+    }
+    </script>  
+</html>

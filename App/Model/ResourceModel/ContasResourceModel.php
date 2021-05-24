@@ -2,6 +2,7 @@
 
 namespace App\Model\ResourceModel;
 
+use App\Controller\Contas;
 use PDO;
 use Exception;
 use App\Core\Transaction;
@@ -29,17 +30,27 @@ class ContasResourceModel
             $result = $conn->prepare($sql);
             $result->execute([':numero_conta' => $numero_conta, ':senha' => $senha]);
             $contas = $result->fetch(PDO::FETCH_ASSOC);
-            
+                        
             return $contas;
         } else {
             throw new Exception('Não há transação ativa!!'.__FUNCTION__);
         }
     }
 
-    public static function findTransacoesByConta($contas_id)
+    public static function findTransacoesByConta(int $contas_id, bool $join = false)
     {
-        if ($conn = Transaction::get()) {            
-            $result = $conn->prepare("select * from transacoes WHERE contas_id= :contas_id");
+        if ($conn = Transaction::get()) {      
+            $sql = "select * from transacoes WHERE contas_id= :contas_id ORDER BY id desc";      
+            $sql_join = "select t.numero_transacao, tp.descricao as tipo_transacao,
+            ct.numero_conta as conta_transferencia_id, t.credito_debito as credito_debito,
+            t.valor, date_format(t.created_at, '%d/%m/%Y %H:%i:%s') as created_at
+            from transacoes t
+            inner join tipo_transacao tp on (t.tipo_transacao_id = tp.id)
+            left join contas ct on (t.conta_transferencia_id = ct.id)  
+            WHERE t.contas_id= :contas_id ORDER BY t.id desc";
+            $sql = ($join) ? $sql_join : $sql ;
+            
+            $result = $conn->prepare($sql);
             $result->execute([':contas_id' => $contas_id]);
             
             return $result->fetchAll(PDO::FETCH_ASSOC);
@@ -50,33 +61,17 @@ class ContasResourceModel
 
     public static function getSaldo(array $transacoes_conta) 
     {
-        try {
-            $result = 0;
-            foreach ($transacoes_conta as $transacao)
-            {                     
-                if ($transacao['credito_debito'] == 'D') {
-                    $result -= $transacao['valor'];
-                } else {
-                    $result += $transacao['valor'];
-                }                
-            }    
-            return $result;
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
-    }
-
-    public static function delete($numero_conta)
-    {
-        if ($conn = Transaction::get()) {
-            $sql = "DELETE from contas WHERE numero_conta= :numero_conta";
-            $result = $conn->prepare($sql);
-            $result->execute([':numero_conta' => $numero_conta]);
-
-            return $result;
-        } else {
-            throw new Exception('Não há transação ativa!!'.__FUNCTION__);        
-        }
+        
+        $result = 0;
+        foreach ($transacoes_conta as $transacao)
+        {                     
+            if ($transacao['credito_debito'] == 'D' || $transacao['credito_debito'] == 'Débito') {
+                $result -= (double) $transacao['valor'];
+            } else {
+                $result += (double) $transacao['valor'];
+            }                
+        }    
+        return $result;
     }
 
     public static function all()
@@ -98,6 +93,7 @@ class ContasResourceModel
             }
             $id = isset($contas['id']) ? $contas['id'] : 0;
             unset($contas['id']);
+            //$contas['senha'] = md5($contas['senha']);
 
             if (empty($id)) {
                 $keys_insert = implode(", ",array_keys($contas));
@@ -111,8 +107,8 @@ class ContasResourceModel
                 }
                 $set_update = implode(", ", $set);
                 $sql = "UPDATE contas SET $set_update WHERE id = '$id'";
-
             }
+            //die($sql);
 
             return $conn->query($sql);
         } else {

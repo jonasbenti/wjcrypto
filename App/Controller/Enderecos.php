@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Exception;
 use App\Helper\Helper;
+use App\Model\LoggerModel;
 use App\Model\EnderecosModel;
 use App\Api\Controller\ControllerInterface;
 
@@ -12,11 +13,13 @@ class Enderecos implements ControllerInterface
     /** @var Helper $helper */
     private $helper;
     private $enderecos;
+    private $numero_conta; 
 
     public function __construct(Helper $helper)
     {
         $this->helper = $helper;
         $this->enderecos = new EnderecosModel();
+        $this->numero_conta = isset($_SESSION['numero_conta']) ? $_SESSION['numero_conta'] : "API";
     }
 
     public function execute (?array $params = null): void
@@ -27,41 +30,37 @@ class Enderecos implements ControllerInterface
     public function getById (int $id): void
     {
         try {
-            $list = $this->enderecos->edit($id);
+            $result = $this->enderecos->edit($id);
+            $log = new LoggerModel('warning', __FUNCTION__." - Endereço ".$this->numero_conta ,['msg' => $result, 'data' => $id]);
+            $log->createLog();
+            $this->helper->response()->json([
+                "message" => $result
+            ]);      
         } catch (Exception $e) {
-           
+            $log = new LoggerModel('error', __FUNCTION__." - Endereço ".$this->numero_conta ,['msg' => $e->getMessage(), 'data' => $id]);
+            $log->createLog();
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
         }
-        
-        $this->helper->response()->json([
-            "message" => "Endereco listado",
-            "res" => $list
-        ]);
-
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
     }
 
     public function save (): void
     {
         try {
-            $list = $this->enderecos->save($_POST);
+            $result = $this->enderecos->save($_POST);
+            $log = new LoggerModel('warning', __FUNCTION__." - Endereço ".$this->numero_conta ,['msg' => $result, 'data' => $_POST]);
+            $log->createLog();
+            $this->helper->response()->json([
+                "message" => $result
+            ]);      
         } catch (Exception $e) {
-           
+            $log = new LoggerModel('error', __FUNCTION__." - Endereço ".$this->numero_conta ,['msg' => $e->getMessage(), 'data' => $_POST]);
+            $log->createLog();
             $this->helper->response()->json([
                 "message" => $e->getMessage()
             ]);
         }
-        
-        $this->helper->response()->json([
-            "message" => "Salvo com successo!",
-            "res" => $list
-        ]);
-
-        //$this->helper->redirect('/html/index.html');
-        // $this->helper->redirect('https://www.google.com');
     }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 use DI\ContainerBuilder;
 use App\Model\ClassLoader;
 use Pecee\SimpleRouter\SimpleRouter;

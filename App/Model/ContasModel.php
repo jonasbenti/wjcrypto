@@ -5,6 +5,7 @@ use Exception;
 use App\Core\Transaction;
 use App\Model\LoggerModel;
 use App\Model\ResourceModel\ContasResourceModel;
+use Monolog\Handler\Curl\Util;
 
 class ContasModel
 {
@@ -13,67 +14,60 @@ class ContasModel
 
     public function save($param)
     { 
-        try {
+        //try {
             Transaction::open($this->database);
-            if(!isset($param['id']))
-            $param['numero_conta'] = ContasResourceModel::nextConta();
+            if(!isset($param['id'])) $param['numero_conta'] = ContasResourceModel::nextConta();
+            $param = UtilModel::encrypt($param);
             $result = ContasResourceModel::save($param);
             Transaction::close();
 
-            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $result]);
-            $log->createLog();            
-            
             return $result;            
-        } catch (Exception $e) {
-            Transaction::rollback();
-            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $param]);
-            $log->createLog();
-            echo $e->getMessage();
-        }
+        // } catch (Exception $e) {
+        //     Transaction::rollback();
+        //     $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $param]);
+        //     $log->createLog();
+        //     echo $e->getMessage();
+        // }
     }
 
     public function edit($numero_conta)
     {
-        try {
+        //try {
             Transaction::open($this->database);
             $result= ContasResourceModel::find($numero_conta);
             Transaction::close();
-
-            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $result]);
-            $log->createLog();     
+            $result = UtilModel::encrypt($result);
 
             return $result;
-        } catch (Exception $e) {
-        Transaction::rollback();
-        $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
-        $log->createLog();
-        echo $e->getMessage();
-        }
+        // } catch (Exception $e) {
+        // Transaction::rollback();
+        // $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
+        // $log->createLog();
+        // echo $e->getMessage();
+        // }
     }
 
     public function validaConta($numero_conta, $senha)
     {
-        try {
+        //try {
             Transaction::open($this->database);
             $result= ContasResourceModel::findByContaSenha($numero_conta, $senha);
             Transaction::close();
 
             // $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $result]);
             // $log->createLog();     
-
             return $result;
-        } catch (Exception $e) {
-        Transaction::rollback();
-        $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => '']);
-        $log->createLog();
-        echo $e->getMessage();
-        }
+        // } catch (Exception $e) {
+        // Transaction::rollback();
+        // $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => '']);
+        // $log->createLog();
+        // echo $e->getMessage();
+        // }
     }
 
     public function getSaldoByConta($numero_conta)
     {
-        try 
-        {
+        //try
             Transaction::open($this->database);
             $dados_conta = ContasResourceModel::find($numero_conta);
             $transacoes_conta = ContasResourceModel::findTransacoesByConta($dados_conta['id']);
@@ -81,73 +75,46 @@ class ContasModel
 
             $saldo = ContasResourceModel::getSaldo($transacoes_conta);
 
-            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $transacoes_conta]);
-            $log->createLog();
-            
             return $saldo;
-        } catch (Exception $e) {
-            Transaction::rollback();
-            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
-            $log->createLog();
-            echo $e->getMessage();
-        }
+        // } catch (Exception $e) {
+        //     Transaction::rollback();
+        //     $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
+        //     $log->createLog();
+        //     echo $e->getMessage();
+        // }
     }
 
     public function getTransacoesByConta($numero_conta)
     {
-        try {
+        //try
             Transaction::open($this->database);
             $dados_conta = ContasResourceModel::find($numero_conta);
-            $transacoes_conta = ContasResourceModel::findTransacoesByConta($dados_conta['id']);
+            $transacoes_conta = ContasResourceModel::findTransacoesByConta($dados_conta['id'], true);
             Transaction::close();
+            $transacoes_conta = UtilModel::decrypt($transacoes_conta);
 
-            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $transacoes_conta]);
-            $log->createLog();
-            
             return $transacoes_conta;
-        } catch (Exception $e) {
-            Transaction::rollback();
-            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
-            $log->createLog();
-            echo $e->getMessage();
-        }
-    }
-
-    public function delete($numero_conta)
-    {
-        try {
-            Transaction::open($this->database);   
-            $result = ContasResourceModel::delete($numero_conta);    
-            Transaction::close();
-
-            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $result]);
-            $log->createLog();     
-
-            return $result;
-        } catch (Exception $e) {
-            Transaction::rollback();
-            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
-            $log->createLog();
-            echo $e->getMessage();
-        }
+        // } catch (Exception $e) {
+        //     Transaction::rollback();
+        //     $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__,['result' => $e->getMessage() , 'data' => $numero_conta]);
+        //     $log->createLog();
+        //     echo $e->getMessage();
+        // }
     }
 
     public function load()
     {
-        try {
+        //try{
             Transaction::open($this->database);    
             $result = ContasResourceModel::all();        
             Transaction::close();
 
-            $log = new LoggerModel('warning', __CLASS__."->".__FUNCTION__,['sql' => $result]);
-            $log->createLog();   
-
             return $result;    
-        } catch (Exception $e) {
-            Transaction::rollback();
-            $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__, ['result' => $e->getMessage() , 'data' => '']);
-            $log->createLog();
-            echo $e->getMessage();
-        }
+        // } catch (Exception $e) {
+        //     Transaction::rollback();
+        //     $log = new LoggerModel('error', __CLASS__."->".__FUNCTION__, ['result' => $e->getMessage() , 'data' => '']);
+        //     $log->createLog();
+        //     echo $e->getMessage();
+        // }
     }
 }
