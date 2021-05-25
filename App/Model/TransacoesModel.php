@@ -32,7 +32,7 @@ class TransacoesModel
     public function createTransacao($param)
     {
         Transaction::open($this->database);
-        $numero_conta_trans = $param['conta_transferencia_id'];
+        $numero_conta_trans = $param['conta_transferencia_id'] ?? 0;
 
         $transacoes_conta = ContasResourceModel::findTransacoesByConta($param['contas_id']);
         //die(var_dump($transacoes_conta));

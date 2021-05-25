@@ -72,6 +72,7 @@ class ContasModel
             $dados_conta = ContasResourceModel::find($numero_conta);
             $transacoes_conta = ContasResourceModel::findTransacoesByConta($dados_conta['id']);
             Transaction::close();
+            $transacoes_conta = UtilModel::decrypt($transacoes_conta);
 
             $saldo = ContasResourceModel::getSaldo($transacoes_conta);
 

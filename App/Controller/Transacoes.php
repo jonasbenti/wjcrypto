@@ -44,12 +44,21 @@ class Transacoes implements ControllerInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Basic $auth_basic"));
         $transacoes = json_decode(curl_exec($ch), true);
+
+        $url2 = "http://trilha1.webjump.com.br/contas_saldo/".$numero_conta;
+        $ch2 = curl_init($url2);
+        curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch2, CURLOPT_HTTPHEADER, array("Authorization: Basic $auth_basic"));
+        $saldo_conta = json_decode(curl_exec($ch2), true);
+        $saldo = str_replace('.', ',', $saldo_conta['message']);
         
         foreach($transacoes['message'] as $transacao){
             $item = file_get_contents('html/item_transacoes.html');
             extract($transacao);
             $valor =  str_replace('.', ',', $valor);
             $credito_debito = ($credito_debito == 'C') ? 'Crédito' : 'Débito' ;
+            $conta_transferencia_id = $conta_transferencia_id ?: ' - ' ;
             $item = str_replace('{numero_transacao}', $numero_transacao, $item);
             $item = str_replace('{tipo_transacao}', $tipo_transacao, $item);
             $item = str_replace('{conta_transferencia_id}', $conta_transferencia_id, $item);
@@ -61,6 +70,8 @@ class Transacoes implements ControllerInterface
         }
         $html = str_replace('{numero_conta}', $numero_conta, $html);
         $html = str_replace('{items}', $items, $html);
+        $html = str_replace('{data_hora}', date("d/m/Y H:i:s"), $html);
+        $html = str_replace('{saldo}', $saldo, $html);
         $log = new LoggerModel('warning', __FUNCTION__." - Conta ".$numero_conta,['msg' => 'Acesso Lista de Transações', 'data' => $transacoes]);
         $log->createLog();
         echo $html;

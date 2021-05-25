@@ -15,8 +15,6 @@
         <div class="panel panel-primary">
             <div class="panel-heading" style="text-align:center">Transação: Conta {numero_conta}</div>
         </div>
-        <!-- <form enctype="multipart/form-data"  method="post" href="/"> -->
-        <!-- <form id="formTransacao" method="post"> -->
         <input type="hidden" id="contas_id" value="{contas_id}">
         <input type="hidden" id="token" value="{token}">
         <input type="hidden" id="numero_conta" value="{numero_conta}">
@@ -44,6 +42,19 @@
      
 </div>
 <script>
+    $('.dinheiro').mask('#.##0,00', {reverse: true});
+    $('.cep').mask('000000');
+    function exibir_ocultar(val) {
+        if(val.value != '3') {            
+            document.getElementById('conta_transferencia_id_div').style.display = 'none';
+            document.getElementById('valor_div').style.display = 'block';
+            document.getElementById('conta_transferencia_id').required = false;
+        } else {
+            document.getElementById('conta_transferencia_id_div').style.display = 'block';
+            document.getElementById('valor_div').style.display = 'block';
+            document.getElementById('conta_transferencia_id').required = true;
+        }
+    };
     var el_contas_id = document.getElementById("contas_id");
     var el_conta_transferencia_id = document.getElementById("conta_transferencia_id");
     var el_valor = document.getElementById("valor");
@@ -62,7 +73,6 @@
         //colunas a ajustar
         valor = valor.replace(".", "").replace(",",".");
         conta_transferencia_id = tipo_transacao_id == 3 ? conta_transferencia_id : 0;
-
 
         body = {
             contas_id: contas_id,
@@ -90,22 +100,7 @@
             alert("erro ao realizar transação!"+obj.message);
             return false;
         })
-    }
-
-    $('.dinheiro').mask('#.##0,00', {reverse: true});
-    $('.cep').mask('000000');
-    function exibir_ocultar(val) {
-        if(val.value != '3') {
-            
-            document.getElementById('conta_transferencia_id_div').style.display = 'none';
-            document.getElementById('valor_div').style.display = 'block';
-            document.getElementById('conta_transferencia_id').required = false;
-        } else {
-            document.getElementById('conta_transferencia_id_div').style.display = 'block';
-            document.getElementById('valor_div').style.display = 'block';
-            document.getElementById('conta_transferencia_id').required = true;
-        }
-    };
+    }   
 </script>
 </body>
 </html>
